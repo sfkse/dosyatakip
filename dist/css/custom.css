@@ -1,0 +1,116 @@
+tr {
+  text-align: center;
+}
+
+.profile-user-img {
+  display: block;
+  margin-bottom: 1em !important;
+  width: 130px;
+}
+
+.brand-container {
+  text-align: center;
+}
+/* dosya düzenle/ekle */
+
+.dosya-inputs-content {
+  display: flex;
+  justify-content: space-around;
+}
+
+.dosya-inputs-row {
+  width: 48%;
+  border-style: solid;
+  border-color: hsl(0, 0%, 94%);
+}
+
+.dosya-inputs-wrap {
+  width: 100%;
+  background: #fff;
+  padding: 2em 2em;
+  display: flex;
+  flex-direction: column;
+}
+
+.dosya-inputs {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.dosya-inputs .input-group label {
+  margin: 0 1em;
+  width: 30%;
+}
+.dosya-inputs .input-group .form-control {
+  margin: 0 1em;
+  width: 100%;
+}
+.details-row {
+  margin: 2em 0.5em;
+  min-width: 100%;
+}
+.dosya-inputs-submit {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.table-text {
+  width: 100%;
+  border: 0.2px solid rgb(0, 0, 0, 0.2);
+  margin-top: 2em;
+}
+
+.dosyaek-metin {
+  height: 5rem;
+
+  overflow: auto;
+  padding: 1em;
+  background-color: #f4f6f9;
+}
+.dosyaek-metin2 {
+  height: 13rem;
+  position: relative;
+  overflow: auto;
+  padding: 1em;
+  background-color: #f4f6f9;
+}
+
+/*dosya*/
+
+.custom-select {
+  width: 50px !important;
+}
+.option-btn {
+  display: flex;
+  justify-content: flex-start;
+}
+/*dosya ekle*/
+
+.detail-wrapper {
+  width: 50%;
+}
+
+/* hatırlatmalar */
+.reminder-description {
+  margin: 0 !important;
+}
+/* personel girişi*/
+
+.select2-container {
+  margin: 0 auto !important;
+  width: 100%;
+}
+.select2-selection__choice {
+  border: none !important;
+
+  background-color: #007bff !important;
+  overflow: auto !important;
+}
+.select2-selection--multiple {
+  border-radius: 0px !important;
+}
+.select2-selection--multiple:focus {
+  border: 0.3px solid #007bff !important;
+}
