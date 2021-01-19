@@ -52,12 +52,6 @@ class crud
       ];
 
 
-      /*COOKIE İŞLEMLERİ YAPILACAK -BENİ HATRILA-*/
-
-      /* if ($remember) {
-
-        setcookie("remember",)
-      }*/
       header("Location:../index?login=success");
       exit();
     } else {
@@ -68,7 +62,7 @@ class crud
 
 
 
-  /*===Genel insert metodu===*/
+
 
   function formatquery($values)
   {
