@@ -244,277 +244,277 @@ function bolgelistele($table,$user_id){
 }*/
 
 
-function userupdate($table, $values, $id)
-{
+  function userupdate($table, $values, $id)
+  {
 
-  $id = $values["user_id"];
-
-
-  if ($values["user_password"]) {
-
-    if ($values["user_password"] != $values["user_password_1"] || $values["user_password"] == "" || $values["user_password_1"] == "") {
+    $id = $values["user_id"];
 
 
+    if ($values["user_password"]) {
 
-      $url = htmlspecialchars($_SERVER['PHP_SELF']);
-      header("Location:..$url?pass=same&id=$id");
-      exit();
+      if ($values["user_password"] != $values["user_password_1"] || $values["user_password"] == "" || $values["user_password_1"] == "") {
+
+
+
+        $url = htmlspecialchars($_SERVER['PHP_SELF']);
+        header("Location:..$url?pass=same&id=$id");
+        exit();
+      } else {
+
+        unset($values["user_password_1"], $values["updateuser"], $values["user_id"]);
+
+        $values["user_password"] = sha1(md5(sha1($values["user_password"])));
+
+
+        $query = $this->db->prepare("UPDATE $table SET {$this->formatquery($values)} where user_id=$id");
+        $query->execute(array_values($values));
+
+        $count = $query->rowCount();
+
+
+        if ($count) {
+
+          $url = htmlspecialchars($_SERVER['PHP_SELF']);
+          header("Location:..$url?update=ok&pass=ok&id=$id");
+          exit();
+        } else {
+
+          $url = htmlspecialchars($_SERVER['PHP_SELF']);
+          header("Location:..$url?update=no&id=$id");
+          exit();
+        }
+      }
     } else {
 
-      unset($values["user_password_1"], $values["updateuser"], $values["user_id"]);
+      unset($values["user_password"], $values["user_password_1"], $values["updateuser"], $values["user_id"], $values["iller"]);
 
-      $values["user_password"] = sha1(md5(sha1($values["user_password"])));
+      $col_name = $table . "_id";
 
 
       $query = $this->db->prepare("UPDATE $table SET {$this->formatquery($values)} where user_id=$id");
       $query->execute(array_values($values));
 
-      $count = $query->rowCount();
+      $query->rowCount();
 
 
-      if ($count) {
 
-        $url = htmlspecialchars($_SERVER['PHP_SELF']);
-        header("Location:..$url?update=ok&pass=ok&id=$id");
-        exit();
-      } else {
-
-        $url = htmlspecialchars($_SERVER['PHP_SELF']);
-        header("Location:..$url?update=no&id=$id");
-        exit();
-      }
+      $url = htmlspecialchars($_SERVER['PHP_SELF']);
+      header("Location:..$url?update=ok&pass=no&id=$id");
+      exit();
     }
-  } else {
+  }
 
-    unset($values["user_password"], $values["user_password_1"], $values["updateuser"], $values["user_id"], $values["iller"]);
+
+
+  /*===Kaydın son halini göster===*/
+  function registerlist($table, $id, $cols = "*")
+  {
+
 
     $col_name = $table . "_id";
 
+    $get = $this->db->prepare("SELECT $cols FROM $table where $col_name=?");
+    $get->execute([$id]);
 
-    $query = $this->db->prepare("UPDATE $table SET {$this->formatquery($values)} where user_id=$id");
-    $query->execute(array_values($values));
-
-    $query->rowCount();
-
-
-
-    $url = htmlspecialchars($_SERVER['PHP_SELF']);
-    header("Location:..$url?update=ok&pass=no&id=$id");
-    exit();
+    return $get;
   }
-}
 
 
 
-/*===Kaydın son halini göster===*/
-function registerlist($table, $id, $cols = "*")
-{
-
-
-  $col_name = $table . "_id";
-
-  $get = $this->db->prepare("SELECT $cols FROM $table where $col_name=?");
-  $get->execute([$id]);
-
-  return $get;
-}
-
-
-
-/*===Kayıtarı listeler===*/
-function tablelist($table, $cols = ["*"], $options = [])
-{
+  /*===Kayıtarı listeler===*/
+  function tablelist($table, $cols = ["*"], $options = [])
+  {
 
     // echo $table;
     // print_r($cols);
     // print_r($options);
     // echo $extra;
     // exit();
-  $deger = implode(",", array_map(function ($args) {
+    $deger = implode(",", array_map(function ($args) {
 
-    return $son = $args;
-  }, array_values($cols)));
-
-
-  $detail = implode(" and ", array_map(function ($args) {
-
-    return $son = $args . "=?";
-  }, array_keys($options)));
+      return $son = $args;
+    }, array_values($cols)));
 
 
+    $detail = implode(" and ", array_map(function ($args) {
 
-  $son = "where " . $detail;
-
-
-  if ($options != null) {
+      return $son = $args . "=?";
+    }, array_keys($options)));
 
 
 
-
-    $query = $this->db->prepare("SELECT $deger FROM $table $son");
-    $query->execute(array_values($options));
+    $son = "where " . $detail;
 
 
-    return $query;
-  } else {
+    if ($options != null) {
 
 
 
-    $query = $this->db->prepare("SELECT $deger FROM $table ");
-    $query->execute();
+
+      $query = $this->db->prepare("SELECT $deger FROM $table $son");
+      $query->execute(array_values($options));
+
+
+      return $query;
+    } else {
 
 
 
-    return $query;
+      $query = $this->db->prepare("SELECT $deger FROM $table ");
+      $query->execute();
+
+
+
+      return $query;
+    }
   }
-}
 
 
 
 
-/*===== Dosya İşlemleri =====*/
+  /*===== Dosya İşlemleri =====*/
 
-function dosyaekle($table, $values)
-{
+  function dosyaekle($table, $values)
+  {
     // print_r($values);
     // exit();
-  /* dosya detay bilgilerini farklı tablolara yazdıracağız. ilgili bilgileri ayıklıyoruz */
+    /* dosya detay bilgilerini farklı tablolara yazdıracağız. ilgili bilgileri ayıklıyoruz */
 
 
 
-  $dosyadetay = [$values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"]];
+    $dosyadetay = [$values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"]];
 
 
-  $eksikevrak_id = serialize($values["evrak_id"]);
-
-
-
-
-
-  $tahsilat_tarih = $values["tahsilatlar_tarih"];
-  $tahsilat_tip = $values["tahsilatlar_tip"];
-  $tahsilat_tutar = $values["tahsilatlar_tutar"];
-  $tahsilat = $values["tahsilatlar_detay"];
+    $eksikevrak_id = serialize($values["evrak_id"]);
 
 
 
 
-  $hatirlatmadetay = [$values["hatirlatdiger_detay"], $values["hatirlatadli_detay"]];
-  $tarih = [$values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]];
 
-
-  unset($values["dosyaekle"], $values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["evrak_id"], $values["tahsilatlar_tarih"], $values["tahsilatlar_tip"], $values["tahsilatlar_tutar"], $values["tahsilatlar_detay"], $values["tahsilatlar_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"], $values["hatirlatadli_detay"], $values["hatirlatdiger_detay"], $values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]);
-
-
-
-  $query = $this->db->prepare("INSERT INTO $table SET {$this->formatquery($values)}");
-
-  $query->execute(array_values($values));
-  $count = $query->rowCount();
-
-
-  if ($count) {
-
-    $id = $this->db->lastInsertId();
-
-
-    /* detay detaylarını başka tabloya aktarıyoruz */
-
-
-    $id_son = [$id, $id, $id, $id, $id, $id, $id, $id];
-    $detay_table = ["gelisme", "adlitip", "ceza", "manevi", "hatirlattahkim", "hatirlatitiraz", "hatirlattemyiz", "hatirlaticra"];
-
-
-    $hatirlatmatablo = ["hatirlatdiger", "hatirlatadli"];
-
-    $hatirlatmazaman = ["hatirlatdiger_tarih" => $tarih[0], "hatirlatadli_tarih" => $tarih[1]];
-
-    $hatirlatma_id = [$id, $id];
-    $user_id = $_SESSION["user"]["user_id"];
-
-    if ($dosyadetay != null) {
-
-      $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"]];
-
-      $user = [$user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id];
-
-      $this->dosyadetayekle($detay_table, $dosyadetay, $id_son, $user, $muvekkil);
-    }
-
-    /*eksik evrak bölümünü burada ekleyeeğiz*/
+    $tahsilat_tarih = $values["tahsilatlar_tarih"];
+    $tahsilat_tip = $values["tahsilatlar_tip"];
+    $tahsilat_tutar = $values["tahsilatlar_tutar"];
+    $tahsilat = $values["tahsilatlar_detay"];
 
 
 
-    $this->eksikevrakekle($eksikevrak_id, $id, $user_id);
+
+    $hatirlatmadetay = [$values["hatirlatdiger_detay"], $values["hatirlatadli_detay"]];
+    $tarih = [$values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]];
+
+
+    unset($values["dosyaekle"], $values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["evrak_id"], $values["tahsilatlar_tarih"], $values["tahsilatlar_tip"], $values["tahsilatlar_tutar"], $values["tahsilatlar_detay"], $values["tahsilatlar_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"], $values["hatirlatadli_detay"], $values["hatirlatdiger_detay"], $values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]);
 
 
 
-    /*tahsilatlar bölümünü burada ekleyeceğiz*/
-    if ($tahsilat != null) {
+    $query = $this->db->prepare("INSERT INTO $table SET {$this->formatquery($values)}");
 
-      $this->tahsilatekle($tahsilat, $tahsilat_tarih, $tahsilat_tip, $tahsilat_tutar, $id, $user_id);
-    }
-
-
-    /*hatırlatmalar adli ve diğer bölümünü burada ekleyeceğiz*/
+    $query->execute(array_values($values));
+    $count = $query->rowCount();
 
 
-    if (count($hatirlatmadetay) != 0) {
+    if ($count) {
 
-      $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"]];
-
-      $user = [$user_id, $user_id];
-
-      $this->hatirlatdigerekle($hatirlatmatablo, $hatirlatmadetay, $hatirlatma_id, $hatirlatmazaman, $user, $muvekkil);
-    }
-
-    $url = htmlspecialchars($_SERVER['PHP_SELF']);
-    header("Location:..$url?register=ok&id=$id");
-    exit;
-  } else {
-    $url = htmlspecialchars($_SERVER['PHP_SELF']);
-    header("Location:..$url?register=no");
-
-    exit;
-  }
-}
+      $id = $this->db->lastInsertId();
 
 
-
-function dosyadetayekle($table, $values, $dosya_id, $user, $muvekkil)
-{
+      /* detay detaylarını başka tabloya aktarıyoruz */
 
 
-  /*boş gelen değerleri ayıklıyoruz*/
+      $id_son = [$id, $id, $id, $id, $id, $id, $id, $id];
+      $detay_table = ["gelisme", "adlitip", "ceza", "manevi", "hatirlattahkim", "hatirlatitiraz", "hatirlattemyiz", "hatirlaticra"];
 
-  foreach ($values as $key => $val) {
 
-    if ($val != "") {
+      $hatirlatmatablo = ["hatirlatdiger", "hatirlatadli"];
 
-      $tableson[] = $table[$key];
-      $valueson[] = $values[$key];
+      $hatirlatmazaman = ["hatirlatdiger_tarih" => $tarih[0], "hatirlatadli_tarih" => $tarih[1]];
+
+      $hatirlatma_id = [$id, $id];
+      $user_id = $_SESSION["user"]["user_id"];
+
+      if ($dosyadetay != null) {
+
+        $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"]];
+
+        $user = [$user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id];
+
+        $this->dosyadetayekle($detay_table, $dosyadetay, $id_son, $user, $muvekkil);
+      }
+
+      /*eksik evrak bölümünü burada ekleyeeğiz*/
+
+      if ($eksikevrak_id != "N;") {
+
+        $this->eksikevrakekle($eksikevrak_id, $id, $user_id);
+      }
+
+
+      /*tahsilatlar bölümünü burada ekleyeceğiz*/
+      if ($tahsilat != null) {
+
+        $this->tahsilatekle($tahsilat, $tahsilat_tarih, $tahsilat_tip, $tahsilat_tutar, $id, $user_id);
+      }
+
+
+      /*hatırlatmalar adli ve diğer bölümünü burada ekleyeceğiz*/
+
+
+      if (count($hatirlatmadetay) != 0) {
+
+        $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"]];
+
+        $user = [$user_id, $user_id];
+
+        $this->hatirlatdigerekle($hatirlatmatablo, $hatirlatmadetay, $hatirlatma_id, $hatirlatmazaman, $user, $muvekkil);
+      }
+
+      $url = htmlspecialchars($_SERVER['PHP_SELF']);
+      header("Location:..$url?register=ok&id=$id");
+      exit;
+    } else {
+      $url = htmlspecialchars($_SERVER['PHP_SELF']);
+      header("Location:..$url?register=no");
+
+      exit;
     }
   }
 
 
 
+  function dosyadetayekle($table, $values, $dosya_id, $user, $muvekkil)
+  {
 
 
-  $detay = array_map(function ($args) {
+    /*boş gelen değerleri ayıklıyoruz*/
+
+    foreach ($values as $key => $val) {
+
+      if ($val != "") {
+
+        $tableson[] = $table[$key];
+        $valueson[] = $values[$key];
+      }
+    }
 
 
-    $detay_son = $args . "_detay";
-
-    return $detay_son;
-  }, array_values($tableson));
 
 
 
-  $sonuc = array_map(function ($table, $cols, $values, $id, $user, $muvekkil) {
+    $detay = array_map(function ($args) {
+
+
+      $detay_son = $args . "_detay";
+
+      return $detay_son;
+    }, array_values($tableson));
 
 
 
-    $query = $this->db->prepare("INSERT INTO $table SET 
+    $sonuc = array_map(function ($table, $cols, $values, $id, $user, $muvekkil) {
+
+
+
+      $query = $this->db->prepare("INSERT INTO $table SET 
 
 
       $cols=:$cols,
@@ -523,54 +523,55 @@ function dosyadetayekle($table, $values, $dosya_id, $user, $muvekkil)
       dosya_muvekkil=:dosya_muvekkil
       ");
 
+      $query->execute(array(
+
+        "$cols" => $values,
+        'dosya_id' => $id,
+        'user_id' => $user,
+        'dosya_muvekkil' => $muvekkil
+
+      ));
+
+      return  $query;
+    }, array_values($tableson), array_values($detay), array_values($valueson), array_values($dosya_id), array_values($user), array_values($muvekkil));
+  }
+
+  function dosyadetayguncelle($table, $id, $description)
+  {
+
+
+    $detay = $table . "_detay";
+    $table_id = $table . "_id";
+
+    $query = $this->db->prepare("UPDATE $table SET $detay=:$detay where $table_id=$id");
     $query->execute(array(
 
-      "$cols" => $values,
-      'dosya_id' => $id,
-      'user_id' => $user,
-      'dosya_muvekkil' => $muvekkil
+      "$detay" => $description
 
     ));
-
-    return  $query;
-  }, array_values($tableson), array_values($detay), array_values($valueson), array_values($dosya_id), array_values($user), array_values($muvekkil));
-}
-
-function dosyadetayguncelle($table, $id, $description)
-{
+    return $query;
+  }
 
 
-  $detay = $table . "_detay";
-  $table_id = $table . "_id";
+  function eksikevrakguncelle($evrak_id, $eksikevrak_id)
+  {
 
-  $query = $this->db->prepare("UPDATE $table SET $detay=:$detay where $table_id=$id");
-  $query->execute(array(
+    $query = $this->db->prepare("UPDATE eksikevrak SET evrak_id=:evrak_id where eksikevrak_id=$eksikevrak_id");
+    $query->execute(array(
 
-    "$detay" => $description
+      "evrak_id" => $evrak_id
 
-  ));
-  return $query;
-}
+    ));
+    return $query;
+  }
 
-
-function eksikevrakguncelle($evrak_id,$eksikevrak_id){
-
-$query = $this->db->prepare("UPDATE eksikevrak SET evrak_id=:evrak_id where eksikevrak_id=$eksikevrak_id");
-  $query->execute(array(
-
-    "evrak_id" => $evrak_id
-
-  ));
-  return $query;
-
-}
-
-function eksikevrakekle($evrak_id, $dosya_id, $user_id)
-{
+  function eksikevrakekle($evrak_id, $dosya_id, $user_id)
+  {
 
 
 
-  $query = $this->db->prepare("INSERT INTO eksikevrak SET 
+
+    $query = $this->db->prepare("INSERT INTO eksikevrak SET 
 
 
     evrak_id=:evrak_id,
@@ -579,32 +580,32 @@ function eksikevrakekle($evrak_id, $dosya_id, $user_id)
 
     ");
 
-  $query->execute(array(
+    $query->execute(array(
 
-    "evrak_id" => $evrak_id,
-    'dosya_id' => $dosya_id,
-    'user_id' => $user_id
+      "evrak_id" => $evrak_id,
+      'dosya_id' => $dosya_id,
+      'user_id' => $user_id
 
-  ));
-  $count = $query->rowCount();
-
-
+    ));
+    $count = $query->rowCount();
 
 
-  if ($count) {
 
-    return $query;
-  } else {
-    $url = htmlspecialchars($_SERVER['PHP_SELF']);
-    header("Location:..$url?eksikevrak=basarisiz");
-    exit();
+
+    if ($count) {
+
+      return $query;
+    } else {
+      $url = htmlspecialchars($_SERVER['PHP_SELF']);
+      header("Location:..$url?eksikevrak=basarisiz");
+      exit();
+    }
   }
-}
-function tahsilatekle($values, $tarih, $tip, $tutar, $dosya_id, $user_id)
-{
+  function tahsilatekle($values, $tarih, $tip, $tutar, $dosya_id, $user_id)
+  {
 
-  if ($values != null) {
-    $query = $this->db->prepare("INSERT INTO tahsilatlar SET 
+    if ($values != null) {
+      $query = $this->db->prepare("INSERT INTO tahsilatlar SET 
 
 
       tahsilatlar_tip=:tahsilatlar_tip,
@@ -616,63 +617,63 @@ function tahsilatekle($values, $tarih, $tip, $tutar, $dosya_id, $user_id)
 
       ");
 
-    $query->execute(array(
+      $query->execute(array(
 
-      "tahsilatlar_tip" => $tip,
-      "tahsilatlar_tutar" => $tutar,
-      "tahsilatlar_tarih" => $tarih,
-      "tahsilatlar_detay" => $values, 
-      'dosya_id' => $dosya_id,
-      'user_id' => $user_id
+        "tahsilatlar_tip" => $tip,
+        "tahsilatlar_tutar" => $tutar,
+        "tahsilatlar_tarih" => $tarih,
+        "tahsilatlar_detay" => $values,
+        'dosya_id' => $dosya_id,
+        'user_id' => $user_id
 
-    ));
-    $count = $query->rowCount();
+      ));
+      $count = $query->rowCount();
 
-    if ($count) {
+      if ($count) {
 
-      return $query;
-    } else {
-      $url = htmlspecialchars($_SERVER['PHP_SELF']);
-      header("Location:..$url?tahsilatlar=basarisiz");
-      exit();
-    }
-  }
-}
-
-function hatirlatdigerekle($table, $values, $dosya_id, $tarih, $user, $muvekkil)
-{
-
-
-
-  /*boş gelen değerleri ayıklıyoruz*/
-
-  foreach ($values as $key => $val) {
-
-    $tarihad = array_keys($tarih);
-    $tarihdeger = array_values($tarih);
-
-    if ($val != "") {
-
-      $tableson[] = $table[$key];
-      $valueson[] = $values[$key];
-      $tarihsonad[] = $tarihad[$key];
-      $tarihsondeger[] = $tarihdeger[$key];;
+        return $query;
+      } else {
+        $url = htmlspecialchars($_SERVER['PHP_SELF']);
+        header("Location:..$url?tahsilatlar=basarisiz");
+        exit();
+      }
     }
   }
 
-  $detay = array_map(function ($args) {
-
-    $detay_son = $args . "_detay";
-
-    return $detay_son;
-  }, array_values($tableson));
+  function hatirlatdigerekle($table, $values, $dosya_id, $tarih, $user, $muvekkil)
+  {
 
 
 
-  $sonuc = array_map(function ($table, $cols, $values, $col_time, $zaman, $id, $user, $muvekkil) {
+    /*boş gelen değerleri ayıklıyoruz*/
+
+    foreach ($values as $key => $val) {
+
+      $tarihad = array_keys($tarih);
+      $tarihdeger = array_values($tarih);
+
+      if ($val != "") {
+
+        $tableson[] = $table[$key];
+        $valueson[] = $values[$key];
+        $tarihsonad[] = $tarihad[$key];
+        $tarihsondeger[] = $tarihdeger[$key];;
+      }
+    }
+
+    $detay = array_map(function ($args) {
+
+      $detay_son = $args . "_detay";
+
+      return $detay_son;
+    }, array_values($tableson));
 
 
-    $query = $this->db->prepare("INSERT INTO $table SET 
+
+    $sonuc = array_map(function ($table, $cols, $values, $col_time, $zaman, $id, $user, $muvekkil) {
+
+
+      $query = $this->db->prepare("INSERT INTO $table SET 
 
 
       $cols=:$cols,
@@ -683,237 +684,239 @@ function hatirlatdigerekle($table, $values, $dosya_id, $tarih, $user, $muvekkil)
 
       ");
 
-    $query->execute(array(
+      $query->execute(array(
 
-      "$cols" => $values,
-      "$col_time" => $zaman,
-      'dosya_id' => $id,
-      'user_id' => $user,
-      'dosya_muvekkil' => $muvekkil
+        "$cols" => $values,
+        "$col_time" => $zaman,
+        'dosya_id' => $id,
+        'user_id' => $user,
+        'dosya_muvekkil' => $muvekkil
 
-    ));
-    return $query;
-  }, array_values($tableson), array_values($detay), array_values($valueson), array_values($tarihsonad), array_values($tarihsondeger), array_values($dosya_id), array_values($user), array_values($muvekkil));
+      ));
+      return $query;
+    }, array_values($tableson), array_values($detay), array_values($valueson), array_values($tarihsonad), array_values($tarihsondeger), array_values($dosya_id), array_values($user), array_values($muvekkil));
 
-  return $sonuc;
-}
-
-
-function dosyaguncelle($table, $values)
-{
-
-  $dosya_id = $values["dosya_id"];
-
-
-  /* dosya detay bilgilerini farklı tablolara yazdıracağız. ilgili bilgileri ayıklıyoruz */
-
-  $dosyadetay = [$values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"]];
-
-
-
-  $eksikevrak_id = serialize($values["evrak_id"]);
-
-$eksikevrak_id2 = serialize($values["evrak_id2"]);
-
-
-
-  $tahsilat_tarih = $values["tahsilatlar_tarih"];
-  $tahsilat_tip = $values["tahsilatlar_tip"];
-  $tahsilat_tutar = $values["tahsilatlar_tutar"];
-  $tahsilat = $values["tahsilatlar_detay"];
-
-
-
-
-  $hatirlatmadetay = [$values["hatirlatdiger_detay"], $values["hatirlatadli_detay"]];
-  $tarih = [$values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]];
-
-
-  unset($values["dosyaguncelle"], $values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["evrak_id"],$values["evrak_id2"], $values["tahsilatlar_tarih"], $values["tahsilatlar_tip"], $values["tahsilatlar_tutar"], $values["tahsilatlar_detay"], $values["tahsilatlar_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"], $values["hatirlatadli_detay"], $values["hatirlatdiger_detay"], $values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]);
-
-
-  $query = $this->db->prepare("UPDATE $table SET {$this->formatquery($values)} where dosya_id=$dosya_id");
-
-  $count = $query->execute(array_values($values));
-
-
-
-  if ($count) {
-
-    $user_id = $_SESSION["user"]["user_id"];
-
-    $id_son = [$dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id];
-
-
-
-    $detay_table = ["gelisme", "adlitip", "ceza", "manevi", "hatirlattahkim", "hatirlatitiraz", "hatirlattemyiz", "hatirlaticra"];
-
-
-    /*hatırlatmaları burada ekleyeceğiz*/
-    $hatirlatmatablo = ["hatirlatdiger", "hatirlatadli"];
-
-    $hatirlatmazaman = ["hatirlatdiger_tarih" => $tarih[0], "hatirlatadli_tarih" => $tarih[1]];
-
-    $hatirlatma_id = [$dosya_id, $dosya_id];
-
-
-
-
-    if ($dosyadetay != null) {
-
-      $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"]];
-
-      $user = [$user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id];
-
-      $this->dosyadetayekle($detay_table, $dosyadetay, $id_son, $user, $muvekkil);
-    }
-
-    /*eksik evrak bölümünü burada ekleyeeğiz*/
-
-
-    $this->eksikevrakekle($eksikevrak_id, $dosya_id, $user_id);
-
-
-
-    /*tahsilatlar bölümünü burada ekleyeceğiz*/
-
-    if ($tahsilat != null) {
-
-      $this->tahsilatekle($tahsilat, $tahsilat_tarih, $tahsilat_tip, $tahsilat_tutar, $dosya_id, $user_id);
-    }
-    /*hatırlatmalar adli ve diğer bölümünü burada ekleyeceğiz*/
-
-    if (count($hatirlatmadetay) != 0) {
-
-
-
-      $user = [$user_id, $user_id];
-
-      $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"]];
-
-      $this->hatirlatdigerekle($hatirlatmatablo, $hatirlatmadetay, $hatirlatma_id, $hatirlatmazaman, $user, $muvekkil);
-    }
-    $url = htmlspecialchars($_SERVER['PHP_SELF']);
-    header("Location:..$url?update=ok&id=$dosya_id");
-    exit;
-  } else {
-    $url = htmlspecialchars($_SERVER['PHP_SELF']);
-    header("Location:..$url?update=no&id=$dosya_id");
-
-    exit;
+    return $sonuc;
   }
-}
+
+
+  function dosyaguncelle($table, $values)
+  {
+
+    $dosya_id = $values["dosya_id"];
+
+
+    /* dosya detay bilgilerini farklı tablolara yazdıracağız. ilgili bilgileri ayıklıyoruz */
+
+    $dosyadetay = [$values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"]];
 
 
 
-function dosyadetaygoster($table, $id, $cols)
-{
+    $eksikevrak_id = serialize($values["evrak_id"]);
 
-  $zaman = $table . "_zaman";
+    $eksikevrak_id2 = serialize($values["evrak_id2"]);
 
-  $get = $this->db->prepare("SELECT $cols FROM $table where dosya_id=? order by $zaman desc");
-  $get->execute([$id]);
 
-  return $get;
-}
 
-function alert($table, $id, $id_value, $due, $dosya_id = [])
-{
+    $tahsilat_tarih = $values["tahsilatlar_tarih"];
+    $tahsilat_tip = $values["tahsilatlar_tip"];
+    $tahsilat_tutar = $values["tahsilatlar_tutar"];
+    $tahsilat = $values["tahsilatlar_detay"];
+
+
+
+
+    $hatirlatmadetay = [$values["hatirlatdiger_detay"], $values["hatirlatadli_detay"]];
+    $tarih = [$values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]];
+
+
+    unset($values["dosyaguncelle"], $values["gelisme_detay"], $values["adlitip_detay"], $values["ceza_detay"], $values["manevi_detay"], $values["evrak_id"], $values["evrak_id2"], $values["tahsilatlar_tarih"], $values["tahsilatlar_tip"], $values["tahsilatlar_tutar"], $values["tahsilatlar_detay"], $values["tahsilatlar_detay"], $values["hatirlattahkim_detay"], $values["hatirlatitiraz_detay"], $values["hatirlattemyiz_detay"], $values["hatirlaticra_detay"], $values["hatirlatadli_detay"], $values["hatirlatdiger_detay"], $values["hatirlatdiger_tarih"], $values["hatirlatadli_tarih"]);
+
+
+    $query = $this->db->prepare("UPDATE $table SET {$this->formatquery($values)} where dosya_id=$dosya_id");
+
+    $count = $query->execute(array_values($values));
+
+
+
+    if ($count) {
+
+      $user_id = $_SESSION["user"]["user_id"];
+
+      $id_son = [$dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id, $dosya_id];
+
+
+
+      $detay_table = ["gelisme", "adlitip", "ceza", "manevi", "hatirlattahkim", "hatirlatitiraz", "hatirlattemyiz", "hatirlaticra"];
+
+
+      /*hatırlatmaları burada ekleyeceğiz*/
+      $hatirlatmatablo = ["hatirlatdiger", "hatirlatadli"];
+
+      $hatirlatmazaman = ["hatirlatdiger_tarih" => $tarih[0], "hatirlatadli_tarih" => $tarih[1]];
+
+      $hatirlatma_id = [$dosya_id, $dosya_id];
+
+
+
+
+      if ($dosyadetay != null) {
+
+        $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"], $values["dosya_muvekkil"]];
+
+        $user = [$user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id];
+
+        $this->dosyadetayekle($detay_table, $dosyadetay, $id_son, $user, $muvekkil);
+      }
+
+      /*eksik evrak bölümünü burada ekleyeeğiz*/
+
+
+
+      if ($eksikevrak_id != "N;") {
+
+        $this->eksikevrakekle($eksikevrak_id, $dosya_id, $user_id);
+      }
+
+      /*tahsilatlar bölümünü burada ekleyeceğiz*/
+
+      if ($tahsilat != null) {
+
+        $this->tahsilatekle($tahsilat, $tahsilat_tarih, $tahsilat_tip, $tahsilat_tutar, $dosya_id, $user_id);
+      }
+      /*hatırlatmalar adli ve diğer bölümünü burada ekleyeceğiz*/
+
+      if (count($hatirlatmadetay) != 0) {
+
+
+
+        $user = [$user_id, $user_id];
+
+        $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"]];
+
+        $this->hatirlatdigerekle($hatirlatmatablo, $hatirlatmadetay, $hatirlatma_id, $hatirlatmazaman, $user, $muvekkil);
+      }
+      $url = htmlspecialchars($_SERVER['PHP_SELF']);
+      header("Location:..$url?update=ok&id=$dosya_id");
+      exit;
+    } else {
+      $url = htmlspecialchars($_SERVER['PHP_SELF']);
+      header("Location:..$url?update=no&id=$dosya_id");
+
+      exit;
+    }
+  }
+
+
+
+  function dosyadetaygoster($table, $id, $cols)
+  {
+
+    $zaman = $table . "_zaman";
+
+    $get = $this->db->prepare("SELECT $cols FROM $table where dosya_id=? order by $zaman desc");
+    $get->execute([$id]);
+
+    return $get;
+  }
+
+  function alert($table, $id, $id_value, $due, $dosya_id = [])
+  {
     // print_r($table);
     // print_r($id);
     // print_r($id_value);
     // print_r($dosya_id);
     // exit;
-  echo '<form method="post" id="update-form">';
-  for ($i = 0; $i < count($table); $i++) {
+    echo '<form method="post" id="update-form">';
+    for ($i = 0; $i < count($table); $i++) {
 
-    $detay = $table[$i] . "_detay";
-    $status = $table[$i] . "_status";
-
-
-    $kategori = ucwords_tr(substr($detay, 8));
-    $kategori = strstr($kategori, "_", true);
+      $detay = $table[$i] . "_detay";
+      $status = $table[$i] . "_status";
 
 
-    if ($dosya_id != null) {
-
-      $deger = implode(",", array_map(function ($args) {
-
-        return $son = $args;
-      }, array_values($dosya_id)));
+      $kategori = ucwords_tr(substr($detay, 8));
+      $kategori = strstr($kategori, "_", true);
 
 
-      $get = $this->db->prepare("SELECT * FROM $table[$i] where $id[$i]=? and $status=? and dosya_id IN($deger)");
-      $get->execute([$id_value[$i], 0]);
-      $count = $get->rowCount();
+      if ($dosya_id != null) {
 
-      if ($count) {
+        $deger = implode(",", array_map(function ($args) {
 
-
-        $getir = $get->fetch(PDO::FETCH_ASSOC);
+          return $son = $args;
+        }, array_values($dosya_id)));
 
 
-        $time = date("d-m-Y", $due[$i]);
+        $get = $this->db->prepare("SELECT * FROM $table[$i] where $id[$i]=? and $status=? and dosya_id IN($deger)");
+        $get->execute([$id_value[$i], 0]);
+        $count = $get->rowCount();
 
-        if (strlen($getir[$detay]) > 50) {
+        if ($count) {
 
-          $str = ucwords_tr(substr($getir[$detay], 0, 50)) . "...";
-        } else {
 
-          $str = ucwords_tr($getir[$detay]);
-        }
+          $getir = $get->fetch(PDO::FETCH_ASSOC);
 
-        if (time() > $due[$i] + 60 * 60 * 24) {
-          echo '
+
+          $time = date("d-m-Y", $due[$i]);
+
+          if (strlen($getir[$detay]) > 50) {
+
+            $str = ucwords_tr(substr($getir[$detay], 0, 50)) . "...";
+          } else {
+
+            $str = ucwords_tr($getir[$detay]);
+          }
+
+          if (time() > $due[$i] + 60 * 60 * 24) {
+            echo '
           <p>
           <button class="reset-timer" type="button" id="' . $id_value[$i] . '" data-table="' . $table[$i] . '"><i style="color:red" class="fas fa-times"></i> </button>&nbsp;
           <span style="background:#e8eaed">Miat: ' . $time . '</span>
           <a class="hatirlatma-link" href="dosyaduzenle?id=' . $getir["dosya_id"] . '"> ' . $kategori . '--' . ucwords_tr($getir["dosya_muvekkil"]) . '----<span class="hatirlat-detay">' .  $str . '</a> 
           </p>
           ';
-        } else {
+          } else {
 
 
-          echo '
+            echo '
           <p>
           <button class="update-status" type="button" id="' . $id_value[$i] . '" data-table="' . $table[$i] . '"><i style="color:green" class="fas fa-check"></i> </button>&nbsp;
           <span style="background:#e8eaed">Miat: ' . $time . '</span>
           <a href="dosyaduzenle?id=' . $getir["dosya_id"] . '"> ' . $kategori . '--' . ucwords_tr($getir["dosya_muvekkil"]) . '--' .  $str . '</span></a> 
           </p>
           ';
+          }
         }
-      }
-    } else {
+      } else {
 
-      $get = $this->db->prepare("SELECT * FROM $table[$i] where $id[$i]=? and $status=?");
-      $get->execute([$id_value[$i], 0]);
-
-
-
-
-      $count = $get->rowCount();
-
-      if ($count) {
-
-
-        $getir = $get->fetch(PDO::FETCH_ASSOC);
-
-        if (strlen($getir[$detay]) > 50) {
-
-          $str = ucwords_tr(substr($getir[$detay], 0, 50)) . "...";
-        } else {
-
-          $str = ucwords_tr($getir[$detay]);
-        }
+        $get = $this->db->prepare("SELECT * FROM $table[$i] where $id[$i]=? and $status=?");
+        $get->execute([$id_value[$i], 0]);
 
 
 
 
-        $time = date("d-m-Y", $due[$i]);
+        $count = $get->rowCount();
 
-        if (time() > $due[$i] + 60 * 60 * 24) {
+        if ($count) {
 
-          echo '
+
+          $getir = $get->fetch(PDO::FETCH_ASSOC);
+
+          if (strlen($getir[$detay]) > 50) {
+
+            $str = ucwords_tr(substr($getir[$detay], 0, 50)) . "...";
+          } else {
+
+            $str = ucwords_tr($getir[$detay]);
+          }
+
+
+
+
+          $time = date("d-m-Y", $due[$i]);
+
+          if (time() > $due[$i] + 60 * 60 * 24) {
+
+            echo '
           <p>
           <button class="reset-timer" type="button" id="' . $id_value[$i] . '" data-table="' . $table[$i] . '"><i style="color:red" class="fas fa-times"></i> </button>&nbsp;
           <span style="background:#e8eaed">Miad: ' . $time . '</span>
@@ -921,98 +924,98 @@ function alert($table, $id, $id_value, $due, $dosya_id = [])
           </p>
 
           ';
-        } else {
+          } else {
 
 
-          echo '
+            echo '
           <p>
           <button class="update-status" type="button" id="' . $id_value[$i] . '" data-table="' . $table[$i] . '"><i style="color:green" class="fas fa-check"></i> </button>&nbsp;
           <span style="background:#e8eaed">Miad: ' . $time . '</span>
           <a href="dosyaduzenle?id=' . $getir["dosya_id"] . '"> ' . $kategori . '--' . ucwords_tr($getir["dosya_muvekkil"]) . '--' . $str . '</a> 
           </p>
           ';
+          }
         }
       }
     }
+    echo '</form>';
   }
-  echo '</form>';
-}
 
-function updatestatus($table, $id, $dosya_update = null)
-{
+  function updatestatus($table, $id, $dosya_update = null)
+  {
 
-  $status = $table . "_status";
-  $table_id = $table . "_id";
-
-  if ($dosya_update != null) {
-
-    $date = new DateTime();
-
-    $query = $this->db->prepare("UPDATE dosya SET dosya_update=:dosya_update where dosya_id=$dosya_update");
-    $query->execute(array(
-
-      "dosya_update" => $date->getTimestamp()
-
-    ));
-  } else {
-
-    $query = $this->db->prepare("UPDATE $table SET $status=:$status where $table_id=$id");
-    $query->execute(array(
-
-      "$status" => 1
-
-    ));
-  }
-}
-
-function durumlar($id)
-{
-
-
-  $query = $this->db->prepare("SELECT durum_id FROM dosya where durum_id=?");
-  $query->execute([$id]);
-  return $query->rowCount();
-}
-
-function hatirlatmaertele($table, $id, $value, $description)
-{
-
-
-
-  if ($value != "") {
-
-
-    $tarih = $table . "_tarih";
+    $status = $table . "_status";
     $table_id = $table . "_id";
-    $detay = $table . "_detay";
 
-    $query = $this->db->prepare("UPDATE $table SET 
+    if ($dosya_update != null) {
+
+      $date = new DateTime();
+
+      $query = $this->db->prepare("UPDATE dosya SET dosya_update=:dosya_update where dosya_id=$dosya_update");
+      $query->execute(array(
+
+        "dosya_update" => $date->getTimestamp()
+
+      ));
+    } else {
+
+      $query = $this->db->prepare("UPDATE $table SET $status=:$status where $table_id=$id");
+      $query->execute(array(
+
+        "$status" => 1
+
+      ));
+    }
+  }
+
+  function durumlar($id)
+  {
+
+
+    $query = $this->db->prepare("SELECT durum_id FROM dosya where durum_id=?");
+    $query->execute([$id]);
+    return $query->rowCount();
+  }
+
+  function hatirlatmaertele($table, $id, $value, $description)
+  {
+
+
+
+    if ($value != "") {
+
+
+      $tarih = $table . "_tarih";
+      $table_id = $table . "_id";
+      $detay = $table . "_detay";
+
+      $query = $this->db->prepare("UPDATE $table SET 
 
       $tarih=:$tarih,
       $detay=:$detay  
 
       where $table_id=$id");
 
-    $query->execute(array(
+      $query->execute(array(
 
-      "$tarih" => $value,
-      "$detay" => $description
+        "$tarih" => $value,
+        "$detay" => $description
 
-    ));
-    $count = $query->rowCount();
-    if ($count) {
+      ));
+      $count = $query->rowCount();
+      if ($count) {
 
-      $url = htmlspecialchars($_SERVER['PHP_SELF']);
-      header("Location:$url?hatirlat=ok");
-      exit();
+        $url = htmlspecialchars($_SERVER['PHP_SELF']);
+        header("Location:$url?hatirlat=ok");
+        exit();
+      } else {
+
+        $url = htmlspecialchars($_SERVER['PHP_SELF']);
+        header("Location:$url?hatirlat=error");
+      }
     } else {
-
       $url = htmlspecialchars($_SERVER['PHP_SELF']);
-      header("Location:$url?hatirlat=error");
+      header("Location:$url?hatirlat=null&detail=$description");
     }
-  } else {
-    $url = htmlspecialchars($_SERVER['PHP_SELF']);
-    header("Location:$url?hatirlat=null&detail=$description");
   }
-}
 }

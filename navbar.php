@@ -44,14 +44,7 @@
 
                 $current = time();
 
-                $days_fifteen = 60 * 60 * 24 * 15; //15 günde 1 ikaz 
-
-
                 $days_always = 60 * 60 * 24 * 15;  // 15 gün boyunca hergün ikaz
-
-
-
-
 
 
                 /*---15 günde bir ikaz---*/
@@ -60,7 +53,7 @@
 
                     $time = strtotime($getir["hatirlattahkim_zaman"]);
 
-                    $due1 = $days_fifteen + $time;
+                    $due1 = $days_always + $time;
 
                     if ($current >= $due1 - (60 * 60 * 24 * 8) && $current < $due1 - (60 * 60 * 24 * 5) && $getir["hatirlattahkim_status"] == 0 && $getir["hatirlattahkim_detay"] != null) {
 
@@ -91,7 +84,7 @@
                     }
                 }
 
-                /*---10 gün boyunca ikaz---*/
+
                 while ($getir1 = $temyiz->fetch(PDO::FETCH_ASSOC)) {
 
 
@@ -177,7 +170,7 @@
                     $time = strtotime($getir3["hatirlatitiraz_zaman"]);
 
 
-                    $due4 = $days_fifteen + $time;
+                    $due4 = (60 * 60 * 24 * 10) + $time;
 
                     if ($current < $due4 - (60 * 60 * 24 * 10)  && $getir3["hatirlatitiraz_status"] == 0   && $getir3["hatirlatitiraz_detay"] != null) {
 
