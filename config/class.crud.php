@@ -497,7 +497,26 @@ function bolgelistele($table,$user_id){
     }
 
 
+    /*========= anasayfa hatırlatmalarda müvekkil ismini günceller =======   */
 
+    $update = array_map(function ($table, $id, $muvekkil) {
+      $queryupdate = $this->db->prepare("UPDATE $table SET
+      
+      
+      dosya_muvekkil=:dosya_muvekkil
+      
+      where dosya_id=$id");
+      $queryupdate->execute(array(
+
+
+        'dosya_muvekkil' => $muvekkil
+
+      ));
+      echo $queryupdate->rowCount();
+    }, array_values($table), array_values($dosya_id), array_values($muvekkil));
+
+
+    /*=======================================================================*/
 
 
     $detay = array_map(function ($args) {
@@ -511,6 +530,7 @@ function bolgelistele($table,$user_id){
 
 
     $sonuc = array_map(function ($table, $cols, $values, $id, $user, $muvekkil) {
+
 
 
 
@@ -644,7 +664,6 @@ function bolgelistele($table,$user_id){
   {
 
 
-
     /*boş gelen değerleri ayıklıyoruz*/
 
     foreach ($values as $key => $val) {
@@ -668,9 +687,34 @@ function bolgelistele($table,$user_id){
       return $detay_son;
     }, array_values($tableson));
 
+    // print_r($table);
+    // print_r($dosya_id);
+    // print_r($muvekkil);
+    // exit;
+    /*========= anasayfa hatırlatmalarda müvekkil ismini günceller =======   */
+
+    $update = array_map(function ($table, $id, $muvekkil) {
+      $queryupdate = $this->db->prepare("UPDATE $table SET
+      
+      
+      dosya_muvekkil=:dosya_muvekkil
+      
+      where dosya_id=$id");
+      $queryupdate->execute(array(
+
+
+        'dosya_muvekkil' => $muvekkil
+
+      ));
+      echo $queryupdate->rowCount();
+    }, array_values($table), array_values($dosya_id), array_values($muvekkil));
+
+
+    /*=======================================================================*/
 
 
     $sonuc = array_map(function ($table, $cols, $values, $col_time, $zaman, $id, $user, $muvekkil) {
+
 
 
       $query = $this->db->prepare("INSERT INTO $table SET 
@@ -714,7 +758,7 @@ function bolgelistele($table,$user_id){
 
     $eksikevrak_id = serialize($values["evrak_id"]);
 
-    $eksikevrak_id2 = serialize($values["evrak_id2"]);
+    // $eksikevrak_id2 = serialize($values["evrak_id2"]);
 
 
 
@@ -786,16 +830,16 @@ function bolgelistele($table,$user_id){
       }
       /*hatırlatmalar adli ve diğer bölümünü burada ekleyeceğiz*/
 
-      if (count($hatirlatmadetay) != 0) {
 
 
 
-        $user = [$user_id, $user_id];
 
-        $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"]];
+      $user = [$user_id, $user_id];
 
-        $this->hatirlatdigerekle($hatirlatmatablo, $hatirlatmadetay, $hatirlatma_id, $hatirlatmazaman, $user, $muvekkil);
-      }
+      $muvekkil = [$values["dosya_muvekkil"], $values["dosya_muvekkil"]];
+
+      $this->hatirlatdigerekle($hatirlatmatablo, $hatirlatmadetay, $hatirlatma_id, $hatirlatmazaman, $user, $muvekkil);
+
       $url = htmlspecialchars($_SERVER['PHP_SELF']);
       header("Location:..$url?update=ok&id=$dosya_id");
       exit;
