@@ -1,3 +1,2 @@
-# Hasar Danışmanlık Dosya Takip Sistemi
-
-Hasar danışmanlık bürolarının dosya takibini kolyalaştırmak amacıyla, yetkilendirme sistemiyle yazılmıştır. Kullanıcıların rollerine göre dosyalara erişim yetkisi kısıtlanıp değiştirilebilir.
+# CMS (For Law Firms)
+It's developed for law firms to ease the case tracking and managing the files they handle with their lawyers.
